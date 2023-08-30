@@ -1,0 +1,8 @@
+.preview-screen,
+.side-pane {
+  background-color: #dff0d8;
+  height: 100%;
+  width: 60%;
+  padding: 30px;
+  overflow: auto;
+}
