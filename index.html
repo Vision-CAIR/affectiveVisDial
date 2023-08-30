@@ -1,0 +1,228 @@
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>Modulated Periodic Activations</title>
+
+    <meta name="description" content="">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.3/clipboard.min.js"></script>
+    <script src="js/app.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h2 class="col-md-12 text-center">
+                Affective Visual Dialog: A Large-Scale Benchmark for Emotional Reasoning
+                Based on Visually Grounded Conversations</br>
+		<small></small>
+            </h2>
+        </div>
+
+        <!--- Authors List --->
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <ul class="list-inline">
+                    <li>
+                        <a href="https://kilichbek.github.io/webpage/">
+                            Kilichbek Haydarov
+                        </a>
+                        </br>KAUST
+                    </li>
+                    <li>
+                        <a href="https://xiaoqian-shen.github.io/">
+                            Xiaoqian Shen
+                        </a>
+                        </br>KAUST
+                    </li>
+                    <li>
+                        <a href="https://avinashsai.github.io/">
+                            Avinash Madasu
+                        </a>
+                        </br>KAUST
+                    </li>
+                    <li>
+                        <a href="#">
+                            Mahmoud Salem
+                        </a>
+                        </br>KAUST
+                    </li>
+                </br>
+                    <li>
+                        <a href="https://healthunity.org/team/jia-li/">
+                            Jia Li
+                        </a>
+                        </br>Stanford University, HealthUnity
+                    </li>
+                    <li>
+                        <a href="https://research.google/people/GamaleldinFathyElsayed/">
+                            Gamaleldin Elsayed
+                        </a>
+                        </br>Google DeepMind
+                    </li>
+                    <li>
+                        <a href="https://www.mohamed-elhoseiny.com/">
+                            Mohamed Elhoseiny
+                        </a>
+                        </br>KAUST
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!--- Teaser ---->
+        <div class="row" id="header_img"> 
+            <figure class="col&#45;md&#45;4 col&#45;md&#45;offset&#45;4"> 
+            <image src="assets/img/web_teaser.png" class="img&#45;responsive" alt="overview"> 
+                <figcaption> 
+                </figcaption> 
+            </figure> 
+        </div> 
+        <!--- Links --->
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h3>
+                <!-- <h3 class="text&#45;center"> -->
+                    Links
+                </h3>
+                <div class="col-md-6 col-md-offset-3 text-center">
+                    <ul class="nav nav-pills nav-justified">
+                        <li>
+                            <a href="#">
+                                Paper
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                Dataset
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/Vision-CAIR/affective-vision-language/tree/main/affect-visdial">
+                                Code
+                            </a>
+                        </li>
+                        <!---
+                        <li>
+                            <a href="img/modsine.txt">
+                                BibTeX
+                            </a>
+                        </li>
+                        --->    
+			            <li>
+                            <a href="mailto:kilichbek.haydarov@kaust.edu.sa">
+                                Contact
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!--- End of Links --->
+
+        <!--- Abstract --->
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h3>
+                    Overview
+                </h3>
+                <p class="text-justify">
+                    We introduce Affective Visual Dialog, an emotion explanation 
+                    and reasoning task as a testbed for research on understanding
+                     the formation of emotions in visually-grounded
+                    conversations. The task involves three skills: 
+                    (1) Dialog-based Question Answering (2) Dialog-based Emotion Prediction 
+                    and (3) Affective emotion explanation generation
+                    based on the dialog. Our key contribution is the collection of a 
+                    large-scale dataset, dubbed AffectVisDial, consisting of 50K 
+                    10-turn visually grounded dialogs as well as
+                    concluding emotion attributions and dialog-informed textual emotion 
+                    explanations, resulting in a total of 27,180
+                    working hours. We explain our design decisions in collecting the 
+                    dataset and introduce the questioner and answerer tasks that are 
+                    associated with the participants in the
+                    conversation. We train and demonstrate solid Affective Visual Dialog 
+                    baselines adapted from state-of-the-art models. Remarkably, 
+                    the responses generated by our models show promising emotional 
+                    reasoning abilities in response to visually grounded conversations
+                </p>
+            </div>
+        </div>
+
+        <!--- Data Collection Process--->
+        <!--- Abstract --->
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h3>
+                    Data Collection Process
+                </h3>
+                <!-- 16:9 aspect ratio -->
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe  class="embed-responsive-item" src="https://drive.google.com/file/d/10BGIvpQH_4tkXl_QVZJf5bNQtKXhakmo/preview"  allow="autoplay"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h3>
+                    Qualitative Results
+                </h3>
+
+				 <div id="header_img"> 
+					<figure class="figure">
+                         <image src="assets/img/dialog_based_qa.png" class="img&#45;responsive" alt="dialog_task"> 
+						 <figcaption class="figure-caption text-center"> 
+                            Qualitative Examples of Dialog-Based Question Answering Task. Open the image in new tab for better view.
+							
+						 </figcaption> 
+					</figure>
+				 </div>
+                 
+                 <figure class="figure">
+                    <image src="assets/img/qual_examples.png" class="img&#45;responsive" alt="explanation_task"> 
+                    <figcaption class="figure-caption text-center"> 
+                        Qualitative Examples of Emotion Explanation Generation Task. Open the image in new tab for better view.
+                    </figcaption> 
+               </figure>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h3>
+                    Acknowledgements
+                </h3>
+                <p class="text-justify">
+                    This project is funded by KAUST
+                    BAS/1/1685-01-01, SDAIA-KAUST Center of Excellence
+                    in Data Science and Artificial Intelligence. The authors express 
+                    their appreciation to Jack Urbanek, Sirojiddin Karimov, and Umid Nejmatullayev 
+                    for their valuable assistance in data collection setup. Lastly, the authors extend their
+                    gratitude to the diligent efforts of the Amazon Mechanical
+                    Turkers, DeepenAI, and SmartOne teams, as their contributions were indispensable for the successful completion of
+                    this work.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
