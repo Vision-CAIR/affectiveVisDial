@@ -27,19 +27,19 @@ torch.manual_seed(SEED)
 data_path = 'data/'
 logs_dir = 'logs/'
 output_dir = 'EmoDialog/'
-subtask = 'ques_aft_expl_gen_emo_gen_emo1_emo2_cap1_cap2_conv'
+subtask = 'ques_aft_expl_gen_emo_gen_emo1_emo2_cap1_cap2_conv_gen_cap'
 
 if('ft_gen_cap' in subtask):
     data_path += 'ft_gen/'
 
-if(subtask.endswith('gen_cap_1')):
+if(subtask.endswith('gen_cap')):
     task = 'image_blip_text_' + subtask
 else:
     task = 'text_only_' + subtask
 
 modelname = 'facebook/bart-large'
 
-if(subtask.endswith('gen_cap_1')):
+if(subtask.endswith('gen_cap')):
     numepochs = 25
 else:
     numepochs = 5
