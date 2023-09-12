@@ -39,7 +39,7 @@
 
 We provide baseline models explanation generation task:
   - [GenLM](./baselines/GenLM/): BERT- and BART-based models [3, 4]
-  - [NLX-GPT](./models/2D/segmentation/): NLX-GPT based model [1]
+  - [NLX-GPT](./baselines/nlx): NLX-GPT based model [1]
 
 <br>
 
