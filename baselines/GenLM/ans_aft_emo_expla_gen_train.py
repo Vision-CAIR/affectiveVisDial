@@ -9,7 +9,10 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 import torch
 from transformers import (
     AutoModelForSeq2SeqLM,
-    AutoTokenizer
+    AutoTokenizer,
+    DataCollatorForSeq2Seq,
+    Seq2SeqTrainer,
+    Seq2SeqTrainingArguments,
 )
 from datasets import load_dataset
 import evaluate
@@ -26,17 +29,22 @@ torch.manual_seed(SEED)
 
 data_path = 'data/'
 logs_dir = 'logs/'
-output_dir = 'EmoDialog/'
-subtask = 'ans_aft_expl_gen_emo_gen_emo1_emo2_cap1_cap2_conv_gen_cap_1'
+if(os.path.isdir(logs_dir) == False):
+    os.mkdir(logs_dir)
 
-if(subtask.endswith('gen_cap_1')):
+output_dir = 'EmoDialog/'
+if(os.path.isdir(output_dir) == False):
+    os.mkdir(output_dir)
+subtask = 'ans_aft_expl_gen_emo_gen_emo1_emo2_cap1_cap2_conv_gen_cap'
+
+if(subtask.endswith('gen_cap')):
     task = 'image_blip_text_' + subtask
 else:
     task = 'text_only_' + subtask
 
 modelname = 'facebook/bart-large'
 
-if(subtask.endswith('gen_cap_1')):
+if(subtask.endswith('gen_cap')):
     numepochs = 25
 else:
     numepochs = 5
@@ -101,22 +109,29 @@ if(os.path.isdir(save_weights) == False):
     os.mkdir(save_weights)
 
 print("###################################################################################################")
-print("Loading from {} ".format(save_weights))
+print("Saving weights to {} ".format(save_weights))
 print("###################################################################################################")
 
+train_file =  data_path + 'train_' + subtask + '.csv'
+dev_file =  data_path + 'dev_' + subtask + '.csv'
 test_file =  data_path + 'test_' + subtask + '.csv'
+
+
+print("###################################################################################################")
+print("Training on {} ".format(train_file))
+print("###################################################################################################")
 
 print("###################################################################################################")
 print("Testing on {} ".format(test_file))
 print("###################################################################################################")
 
-extension = test_file.split(".")[-1]
+extension = train_file.split(".")[-1]
 raw_datasets = load_dataset('csv', 
-    data_files={'train':test_file, 'validation': test_file, 'test': test_file},
+    data_files={'train':train_file, 'validation': dev_file, 'test': test_file},
     )
 
 tokenizer = AutoTokenizer.from_pretrained(
-    save_weights,
+    modelname,
     cache_dir=logs_dir,
     use_fast=True,
     revision='main',
@@ -126,12 +141,12 @@ tokenizer = AutoTokenizer.from_pretrained(
 num_added_toks = tokenizer.add_special_tokens(special_tokens)
 
 model = AutoModelForSeq2SeqLM.from_pretrained(
-    save_weights,
+    modelname,
     from_tf=False,
     cache_dir=logs_dir,
     revision='main',
     use_auth_token=None,
-).to(device)
+)
 
 model.resize_token_embeddings(len(tokenizer))
 
@@ -144,6 +159,26 @@ min_target_length = 1
 ignore_pad_token_for_loss = True
 padding  = "max_length"
 prefix = ""
+
+def preprocess_function(examples):
+    inputs = examples[text_column]
+    targets = examples[summary_column]
+    inputs = [prefix + inp for inp in inputs]
+    model_inputs = tokenizer(inputs, max_length=max_source_length, padding=padding, truncation=True)
+
+    # Setup the tokenizer for targets
+    with tokenizer.as_target_tokenizer():
+        labels = tokenizer(targets, max_length=max_target_length, padding=padding, truncation=True)
+
+    # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
+    # padding in the loss.
+    if padding == "max_length" and ignore_pad_token_for_loss:
+        labels["input_ids"] = [
+            [(l if l != tokenizer.pad_token_id else -100) for l in label] for label in labels["input_ids"]
+        ]
+
+    model_inputs["labels"] = labels["input_ids"]
+    return model_inputs
 
 def preprocess_function_test(examples):
     inputs = examples[text_column]
@@ -158,6 +193,27 @@ def preprocess_function_test(examples):
     model_inputs["labels"] = labels["input_ids"]
     return model_inputs
 
+train_dataset = raw_datasets["train"]
+
+train_dataset = train_dataset.map(
+                preprocess_function,
+                batched=True,
+                num_proc=None,
+                remove_columns=column_names,
+                load_from_cache_file=None,
+                desc="Running tokenizer on train dataset",
+            )
+
+eval_dataset = raw_datasets["validation"]
+eval_dataset = eval_dataset.map(
+             preprocess_function,
+              batched=True,
+              num_proc=None,
+              remove_columns=column_names,
+              load_from_cache_file=None,
+              desc="Running tokenizer on validation dataset",
+          )
+
 test_dataset = raw_datasets["test"]
 test_dataset = test_dataset.map(
               preprocess_function_test,
@@ -166,7 +222,40 @@ test_dataset = test_dataset.map(
               remove_columns=column_names,
               load_from_cache_file=None,
               desc="Running tokenizer on test dataset",
-        )
+          )
+
+label_pad_token_id = -100 if ignore_pad_token_for_loss else tokenizer.pad_token_id
+
+data_collator = DataCollatorForSeq2Seq(
+        tokenizer,
+        model=model,
+        label_pad_token_id=label_pad_token_id,
+        pad_to_multiple_of=32,
+    )
+
+training_args = Seq2SeqTrainingArguments(
+              output_dir=logs_dir,
+              num_train_epochs=numepochs,
+              logging_dir=logs_dir,
+              predict_with_generate=True,
+              per_device_train_batch_size=train_batch_size,
+              per_device_eval_batch_size=test_batch_size,
+              logging_steps=10000000,
+              save_steps=1000000
+              )
+
+trainer = Seq2SeqTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    tokenizer=tokenizer,
+    data_collator=data_collator
+)
+
+train_result = trainer.train(resume_from_checkpoint=None)
+trainer.save_model(output_dir=save_weights)
+
 
 test_batches = len(test_dataset) // test_batch_size + 1
 predictions = []
@@ -250,10 +339,10 @@ bartscore_results = bart_scorer.score(predictions_expl, references_expl, batch_s
 bartscore_results = sum(bartscore_results) / len(bartscore_results)
 print("BARTScore: {} ".format(bartscore_results))
 
-save_emo_expla = os.path.join(output_dir, 'weights', savename, task, str(numepochs), 
-    str(max_source_length) + '_' + str(max_target_length), 'emo_expla.txt')
-with open(save_emo_expla, 'w', encoding='utf-8') as f:
-    for sen in predictions:
+save_res = os.path.join(output_dir, 'weights', savename, task, str(numepochs), 
+    str(max_source_length) + '_' + str(max_target_length), 'results.txt')
+with open(save_res, 'w', encoding='utf-8') as f:
+    for sen in predictions_expl:
         f.write("{}\n".format(sen))
 
 all_metrics = {}

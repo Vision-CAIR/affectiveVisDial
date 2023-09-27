@@ -2,7 +2,6 @@ import os
 import json
 import random
 from tqdm import tqdm
-import pickle as pkl
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
@@ -29,17 +28,25 @@ torch.manual_seed(SEED)
 
 data_path = 'data/'
 logs_dir = 'logs/'
-output_dir = 'EmoDialog/'
-subtask = 'ans_aft_expl_gen_emo_gen_emo1_emo2_cap1_cap2_conv_gen_cap_1'
+if(os.path.isdir(logs_dir) == False):
+    os.mkdir(logs_dir)
 
-if(subtask.endswith('gen_cap_1')):
+output_dir = 'EmoDialog/'
+if(os.path.isdir(output_dir) == False):
+    os.mkdir(output_dir)
+subtask = 'ques_aft_expl_gen_emo_gen_emo1_emo2_cap1_cap2_conv_gen_cap'
+
+if('ft_gen_cap' in subtask):
+    data_path += 'ft_gen/'
+
+if(subtask.endswith('gen_cap')):
     task = 'image_blip_text_' + subtask
 else:
     task = 'text_only_' + subtask
 
 modelname = 'facebook/bart-large'
 
-if(subtask.endswith('gen_cap_1')):
+if(subtask.endswith('gen_cap')):
     numepochs = 25
 else:
     numepochs = 5
@@ -78,7 +85,7 @@ elif(modelname == 'facebook/bart-base'):
     train_batch_size = 32
 elif(modelname == 'facebook/bart-large'):
     savename = 'bart_large'
-    test_batch_size = 32
+    test_batch_size = 64
     train_batch_size = 32
 elif(modelname == 'facebook/opt-1.3b'):
     savename = 'opt_1.3b'
@@ -216,7 +223,7 @@ test_dataset = test_dataset.map(
               num_proc=None,
               remove_columns=column_names,
               load_from_cache_file=None,
-              desc="Running tokenizer on test dataset",
+              desc="Running tokenizer on validation dataset",
           )
 
 label_pad_token_id = -100 if ignore_pad_token_for_loss else tokenizer.pad_token_id
@@ -234,7 +241,7 @@ training_args = Seq2SeqTrainingArguments(
               logging_dir=logs_dir,
               predict_with_generate=True,
               per_device_train_batch_size=train_batch_size,
-              per_device_eval_batch_size=test_batch_size,
+              per_device_eval_batch_size=32,
               logging_steps=10000000,
               save_steps=1000000
               )
